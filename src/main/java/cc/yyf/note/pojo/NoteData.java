@@ -1,11 +1,8 @@
 package cc.yyf.note.pojo;
 
-import lombok.Data;
-
 /**
  * 需要保存的信息
  */
-
 public class NoteData {
     // 选中的文本
     private String selectedText;

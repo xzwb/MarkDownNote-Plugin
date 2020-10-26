@@ -29,3 +29,11 @@ patchPluginXml {
       Add change notes here.<br>
       <em>most HTML tags may be used</em>"""
 }
+
+//task cpRes(type: Copy) {
+//    from sourceSets.main.resources
+//    into sourceSets.main.java.outputDir
+//    processResources.exclude { "**/*.*" }
+//}
+//
+//processResources.dependsOn(cpRes)

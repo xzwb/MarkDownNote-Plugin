@@ -1,7 +1,6 @@
 package cc.yyf.note.window;
 
 import com.intellij.openapi.options.Configurable;
-import org.apache.xmlbeans.impl.jam.JComment;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;

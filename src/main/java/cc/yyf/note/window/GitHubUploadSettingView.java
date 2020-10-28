@@ -7,9 +7,14 @@ import org.jetbrains.annotations.Nls;
 
 import javax.swing.*;
 import java.io.*;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.sql.RowId;
+import java.util.Objects;
 
 public class GitHubUploadSettingView extends UploadSettingView {
     private OtherSettingWindow otherSettingWindow = new OtherSettingWindow();
+
 
     /**
      * 获取最外层控件
@@ -29,10 +34,7 @@ public class GitHubUploadSettingView extends UploadSettingView {
         return "上传github仓库";
     }
 
-    /**
-     * 暂时不知道怎么用
-     * @return
-     */
+
     @Override
     public boolean isModified() {
         return true;
@@ -54,11 +56,22 @@ public class GitHubUploadSettingView extends UploadSettingView {
         FileOutputStream githubAddressIn = null;
         FileOutputStream githubTokenIn = null;
         try {
-            githubAddressIn = new FileOutputStream(this.getClass()
-                    .getResource("/github/gitHubAddress.txt")
-                    .getPath());
+            String classPath = Objects.requireNonNull(this.getClass().getClassLoader().getResource("/").getPath()+"gitHubAddress.txt");
+            classPath = URLDecoder.decode(classPath, StandardCharsets.UTF_8.name());
+            githubAddressIn = new FileOutputStream(classPath);
+            System.out.println(gitHubAddressInFile);
+            githubAddressIn.write(gitHubAddressInFile.getBytes(), 0, gitHubAddressInFile.length());
+            githubAddressIn.flush();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                if (githubAddressIn != null) {
+                    githubAddressIn.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -70,16 +83,33 @@ public class GitHubUploadSettingView extends UploadSettingView {
         InputStream githubAddressIn = null;
         InputStream githubTokenIn = null;
         try {
-            githubAddressIn = GitHubUploadSettingView.class.getResourceAsStream("/github/gitHubAddress.txt");
-            githubTokenIn = GitHubUploadSettingView.class.getResourceAsStream("/github/gitHubToken.txt");
+            // 文件如果没有就创建
+            File fileToken = new File(this.getClass().getResource(File.separator).getPath() + "gitHubToken.txt");
+            if (!fileToken.exists()) {
+                fileToken.createNewFile();
+            }
+            File fileAddress = new File(this.getClass().getResource(File.separator).getPath() + "gitHubAddress.txt");
+            if (!fileAddress.exists()) {
+                fileAddress.createNewFile();
+            }
+            // 获取文件的InPutStream
+            githubTokenIn = new FileInputStream(fileToken);
+            githubAddressIn = new FileInputStream(fileAddress);
             byte[] address = new byte[1024];
             byte[] token = new byte[1024];
-            githubAddressIn.read(address);
-            githubTokenIn.read(token);
-            String githubAddress = new String(address);
-//            githubAddress = DESUtil.decrypt(YYFPasswordUtil.YYF_KEY, githubAddress);
-            String githubToken = new String(token);
-//            githubToken = DESUtil.decrypt(YYFPasswordUtil.YYF_KEY, githubToken);
+            int addressNum = githubAddressIn.read(address);
+            int tokenNum = githubTokenIn.read(token);
+            String githubAddress = "";
+            if (addressNum != -1) {
+                githubAddress = new String(address, 0, addressNum-1);
+                githubAddress = DESUtil.decrypt(YYFPasswordUtil.YYF_KEY, githubAddress);
+            }
+            System.out.println(githubAddress);
+            String githubToken = "";
+            if (tokenNum != -1) {
+                githubToken = new String(token, 0, tokenNum-1);
+                githubToken = DESUtil.decrypt(YYFPasswordUtil.YYF_KEY, githubToken);
+            }
             otherSettingWindow.getGithubRepository().setText(githubAddress);
             otherSettingWindow.getGithubToken().setText(githubToken);
         } catch (Exception e) {

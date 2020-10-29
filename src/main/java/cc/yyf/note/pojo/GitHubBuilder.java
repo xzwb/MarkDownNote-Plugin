@@ -6,12 +6,14 @@ package cc.yyf.note.pojo;
 public class GitHubBuilder {
     private static GitHub gitHub;
 
-    public static GitHub build(String address, String token) {
+    public static GitHub build(String address, String token, String owner) {
         if (gitHub == null) {
-            return new GitHub(address, token);
+            gitHub = new GitHub(address, token, owner);
+            return gitHub;
         }
         gitHub.setGitHubAddress(address);
         gitHub.setGitHubToken(token);
+        gitHub.setGitHubOwner(owner);
         return gitHub;
     }
 }

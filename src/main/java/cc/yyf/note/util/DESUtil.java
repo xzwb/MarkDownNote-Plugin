@@ -100,6 +100,5 @@ public class DESUtil {
             e.printStackTrace();
             return data;
         }
-
     }
 }

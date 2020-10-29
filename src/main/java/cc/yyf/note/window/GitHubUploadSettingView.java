@@ -1,5 +1,6 @@
 package cc.yyf.note.window;
 
+import cc.yyf.note.pojo.GitHubBuilder;
 import cc.yyf.note.util.DESUtil;
 import cc.yyf.note.util.YYFPasswordUtil;
 import com.intellij.openapi.options.ConfigurationException;
@@ -48,12 +49,15 @@ public class GitHubUploadSettingView extends UploadSettingView {
         // 获取到文本框中的内容
         String gitHubAddress = otherSettingWindow.getGithubRepository().getText();
         String gitHubToken = otherSettingWindow.getGithubToken().getText();
+        String gitHubOwner = otherSettingWindow.getGitHubOwner().getText();
         // 加密
         String gitHubAddressInFile = DESUtil.encrypt(YYFPasswordUtil.YYF_KEY, gitHubAddress);
         String gitHubTokenInFile = DESUtil.encrypt(YYFPasswordUtil.YYF_KEY, gitHubToken);
+        String gitHubOwnerInFile = DESUtil.encrypt(YYFPasswordUtil.YYF_KEY, gitHubOwner);
         // 保存进文件
         FileOutputStream githubAddressIn = null;
         FileOutputStream githubTokenIn = null;
+        FileOutputStream githubOwnerIn = null;
         try {
             // gitHubAddress
             String classPath = Objects.requireNonNull(this.getClass().getClassLoader().getResource("/").getPath()+"gitHubAddress.txt");
@@ -67,12 +71,25 @@ public class GitHubUploadSettingView extends UploadSettingView {
             githubTokenIn = new FileOutputStream(classPath);
             githubTokenIn.write(gitHubTokenInFile.getBytes(), 0, gitHubTokenInFile.length());
             githubTokenIn.flush();
+            // gitHubOwner
+            classPath = Objects.requireNonNull(this.getClass().getClassLoader().getResource("/").getPath()+"gitHubOwner.txt");
+            classPath = URLDecoder.decode(classPath, StandardCharsets.UTF_8.name());
+            githubOwnerIn = new FileOutputStream(classPath);
+            githubOwnerIn.write(gitHubOwnerInFile.getBytes(), 0, gitHubOwnerInFile.length());
+            githubOwnerIn.flush();
+            GitHubBuilder.build(gitHubAddress, gitHubToken, gitHubOwner);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {
                 if (githubAddressIn != null) {
                     githubAddressIn.close();
+                }
+                if (githubOwnerIn != null) {
+                    githubOwnerIn.close();
+                }
+                if (githubTokenIn != null) {
+                    githubTokenIn.close();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -85,8 +102,10 @@ public class GitHubUploadSettingView extends UploadSettingView {
      */
     @Override
     public void reset() {
+        System.out.println(GitHubBuilder.getGitHub().getGitHubAddress());
         InputStream githubAddressIn = null;
         InputStream githubTokenIn = null;
+        InputStream githubOwnerIn = null;
         try {
             // 文件如果没有就创建
             File fileToken = new File(this.getClass().getResource(File.separator).getPath() + "gitHubToken.txt");
@@ -97,25 +116,38 @@ public class GitHubUploadSettingView extends UploadSettingView {
             if (!fileAddress.exists()) {
                 fileAddress.createNewFile();
             }
+            File fileOwner = new File(this.getClass().getResource(File.separator).getPath() + "gitHubOwner.txt");
+            if (!fileOwner.exists()) {
+                fileOwner.createNewFile();
+            }
             // 获取文件的InPutStream
             githubTokenIn = new FileInputStream(fileToken);
             githubAddressIn = new FileInputStream(fileAddress);
+            githubOwnerIn = new FileInputStream(fileOwner);
+            byte[] owner = new byte[1024];
             byte[] address = new byte[1024];
             byte[] token = new byte[1024];
             int addressNum = githubAddressIn.read(address);
             int tokenNum = githubTokenIn.read(token);
+            int ownerNum = githubOwnerIn.read(owner);
             String githubAddress = "";
             if (addressNum != -1) {
-                githubAddress = new String(address, 0, addressNum-1);
+                githubAddress = new String(address, 0, addressNum);
                 githubAddress = DESUtil.decrypt(YYFPasswordUtil.YYF_KEY, githubAddress);
             }
             String githubToken = "";
             if (tokenNum != -1) {
-                githubToken = new String(token, 0, tokenNum-1);
+                githubToken = new String(token, 0, tokenNum);
                 githubToken = DESUtil.decrypt(YYFPasswordUtil.YYF_KEY, githubToken);
+            }
+            String githubOwner = "";
+            if (ownerNum != -1) {
+                githubOwner = new String(owner, 0, ownerNum);
+                githubOwner = DESUtil.decrypt(YYFPasswordUtil.YYF_KEY, githubOwner);
             }
             otherSettingWindow.getGithubRepository().setText(githubAddress);
             otherSettingWindow.getGithubToken().setText(githubToken);
+            otherSettingWindow.getGitHubOwner().setText(githubOwner);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -125,6 +157,9 @@ public class GitHubUploadSettingView extends UploadSettingView {
                 }
                 if (githubTokenIn != null) {
                     githubTokenIn.close();
+                }
+                if (githubOwnerIn != null) {
+                    githubOwnerIn.close();
                 }
             } catch (Exception e) {
                 e.printStackTrace();

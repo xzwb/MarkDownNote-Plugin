@@ -7,6 +7,16 @@ public class OtherSettingWindow {
     private JTextField githubToken;
     private JPanel commentPanel;
 
+    public JTextField getGitHubOwner() {
+        return gitHubOwner;
+    }
+
+    public void setGitHubOwner(JTextField gitHubOwner) {
+        this.gitHubOwner = gitHubOwner;
+    }
+
+    private JTextField gitHubOwner;
+
     public JTextField getGithubRepository() {
         return githubRepository;
     }

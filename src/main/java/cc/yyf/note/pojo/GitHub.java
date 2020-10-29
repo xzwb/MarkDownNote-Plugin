@@ -8,10 +8,21 @@ public class GitHub {
     private String gitHubAddress;
     // token
     private String gitHubToken;
+    // github用户名
+    private String gitHubOwner;
 
-    public GitHub(String gitHubAddress, String gitHubToken) {
+    public String getGitHubOwner() {
+        return gitHubOwner;
+    }
+
+    public void setGitHubOwner(String gitHubOwner) {
+        this.gitHubOwner = gitHubOwner;
+    }
+
+    public GitHub(String gitHubAddress, String gitHubToken, String gitHubOwner) {
         this.gitHubAddress = gitHubAddress;
         this.gitHubToken = gitHubToken;
+        this.gitHubOwner = gitHubOwner;
     }
 
     public String getGitHubAddress() {

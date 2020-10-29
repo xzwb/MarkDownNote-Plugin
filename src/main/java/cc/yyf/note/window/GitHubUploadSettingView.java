@@ -9,7 +9,6 @@ import javax.swing.*;
 import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.sql.RowId;
 import java.util.Objects;
 
 public class GitHubUploadSettingView extends UploadSettingView {
@@ -56,12 +55,18 @@ public class GitHubUploadSettingView extends UploadSettingView {
         FileOutputStream githubAddressIn = null;
         FileOutputStream githubTokenIn = null;
         try {
+            // gitHubAddress
             String classPath = Objects.requireNonNull(this.getClass().getClassLoader().getResource("/").getPath()+"gitHubAddress.txt");
             classPath = URLDecoder.decode(classPath, StandardCharsets.UTF_8.name());
             githubAddressIn = new FileOutputStream(classPath);
-            System.out.println(gitHubAddressInFile);
             githubAddressIn.write(gitHubAddressInFile.getBytes(), 0, gitHubAddressInFile.length());
             githubAddressIn.flush();
+            // gitHubToken
+            classPath = Objects.requireNonNull(this.getClass().getClassLoader().getResource("/").getPath()+"gitHubToken.txt");
+            classPath = URLDecoder.decode(classPath, StandardCharsets.UTF_8.name());
+            githubTokenIn = new FileOutputStream(classPath);
+            githubTokenIn.write(gitHubTokenInFile.getBytes(), 0, gitHubTokenInFile.length());
+            githubTokenIn.flush();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -104,7 +109,6 @@ public class GitHubUploadSettingView extends UploadSettingView {
                 githubAddress = new String(address, 0, addressNum-1);
                 githubAddress = DESUtil.decrypt(YYFPasswordUtil.YYF_KEY, githubAddress);
             }
-            System.out.println(githubAddress);
             String githubToken = "";
             if (tokenNum != -1) {
                 githubToken = new String(token, 0, tokenNum-1);

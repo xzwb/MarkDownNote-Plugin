@@ -7,6 +7,8 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.graalvm.compiler.debug.TTY.flush;
+
 /**
  * 使用freeMark进行md文档生成
  */

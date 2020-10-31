@@ -102,7 +102,6 @@ public class GitHubUploadSettingView extends UploadSettingView {
      */
     @Override
     public void reset() {
-        System.out.println(GitHubBuilder.getGitHub().getGitHubAddress());
         InputStream githubAddressIn = null;
         InputStream githubTokenIn = null;
         InputStream githubOwnerIn = null;

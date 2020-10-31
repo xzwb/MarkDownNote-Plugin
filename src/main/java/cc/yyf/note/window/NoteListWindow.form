@@ -77,6 +77,12 @@
               <text value="关闭"/>
             </properties>
           </component>
+          <component id="c60ec" class="javax.swing.JButton" binding="uploadButton">
+            <constraints/>
+            <properties>
+              <text value="上传"/>
+            </properties>
+          </component>
         </children>
       </grid>
     </children>

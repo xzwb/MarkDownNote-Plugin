@@ -1,9 +1,11 @@
 package cc.yyf.note.window;
 
 import cc.yyf.note.pojo.DataCenter;
+import cc.yyf.note.pojo.GitHubBuilder;
 import cc.yyf.note.procesor.DefaultSourceNoteData;
 import cc.yyf.note.procesor.FreeMarkProcessor;
 import cc.yyf.note.procesor.Processor;
+import cc.yyf.note.util.UpLoadGitHubUtil;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
@@ -44,6 +46,7 @@ public class NoteListWindow {
     private JTable table;
     // 文档标题
     private JTextField textFieldTopic;
+    private JButton uploadButton;
 
     /**
      * 初始化表格
@@ -92,6 +95,50 @@ public class NoteListWindow {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 toolWindow.hide(null);
+            }
+        });
+        uploadButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                String topic = textFieldTopic.getText();
+                if (topic == null || "".equals(topic)) {
+                    MessageDialogBuilder.yesNo("操作结果", "文档标题没有输入");
+                    return;
+                }
+                // 要保存的文件名称
+                String fileName = topic + ".md";
+                String path = this.getClass().getResource(File.separator).getPath() + fileName;
+                File file = new File(path);
+                // 文件已经存在
+                if (!file.exists()) {
+                    try {
+                        file.createNewFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return;
+                }
+                Processor processor = new FreeMarkProcessor();
+                try {
+                    processor.process(new DefaultSourceNoteData(path, topic, DataCenter.NOTE_DATA_LIST));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (TemplateException e) {
+                    e.printStackTrace();
+                }
+                file = new File(path);
+                if (UpLoadGitHubUtil.upload(GitHubBuilder.getInstance(), file, fileName)) {
+                    // 发送通知
+                    NotificationGroup firstPluginId = new NotificationGroup("保存文档", NotificationDisplayType.BALLOON, true);
+                    Notification notification = firstPluginId.createNotification("文档上传成功", MessageType.INFO);
+                    Notifications.Bus.notify(notification);
+                } else {
+                    // 发送通知
+                    NotificationGroup firstPluginId = new NotificationGroup("保存文档", NotificationDisplayType.BALLOON, true);
+                    Notification notification = firstPluginId.createNotification("文档上传失败", MessageType.INFO);
+                    Notifications.Bus.notify(notification);
+                }
+                file.delete();
             }
         });
     }

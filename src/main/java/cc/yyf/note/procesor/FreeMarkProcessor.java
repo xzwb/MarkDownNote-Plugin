@@ -12,7 +12,6 @@ public class FreeMarkProcessor extends AbstractFreeMarkProcessor {
     protected Template getTemplate() throws IOException {
         Configuration configuration = new Configuration(Configuration.VERSION_2_3_27);
         // 获取模板
-        System.out.println(FreeMarkProcessor.class.getResource("/template/md.ftl"));
         String templateContent = UrlUtil.loadText(FreeMarkProcessor.class.getResource("/template/md.ftl"));
 
         StringTemplateLoader stringTemplateLoader = new StringTemplateLoader();

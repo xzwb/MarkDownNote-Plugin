@@ -16,4 +16,8 @@ public class GitHubBuilder {
         gitHub.setGitHubOwner(owner);
         return gitHub;
     }
+
+    public static GitHub getInstance() {
+        return gitHub;
+    }
 }
